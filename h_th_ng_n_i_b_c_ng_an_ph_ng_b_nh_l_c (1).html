@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Nội bộ - Công an Phường Bình Lộc</title>
+    <!-- Favicon SVG biểu tượng dạng chữ CAP Bình Lộc -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23991B1B'/%3E%3Cstop offset='100%25' stop-color='%23DC2626'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='4' y='4' width='112' height='112' rx='26' fill='url(%23g)' stroke='%23FACC15' stroke-width='6'/%3E%3Cpolygon points='60,15 63.5,25 74,25 65.5,31.2 68.8,41.2 60,35 51.2,41.2 54.5,31.2 46,25 56.5,25' fill='%23FACC15'/%3E%3Ctext x='60' y='68' text-anchor='middle' font-family='Arial, sans-serif' font-weight='900' font-size='26' fill='%23FACC15' letter-spacing='1'%3ECAP%3C/text%3E%3Ctext x='60' y='88' text-anchor='middle' font-family='Arial, sans-serif' font-weight='800' font-size='13' fill='%23FFFFFF' letter-spacing='0.5'%3EBÌNH LỘC%3C/text%3E%3C/svg%3E">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- QRCodeJS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Hiệu ứng chấm gõ chữ của Chatbot */
+        .typing-dot {
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        /* Tùy chỉnh thanh cuộn */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Chế độ in phiếu hẹn */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #ticket-modal-content, #ticket-modal-content * {
+                visibility: visible;
+            }
+            #ticket-modal-content {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen">
+
+    <!-- ==================== HEADER ĐƠN VỊ ==================== -->
+    <header class="bg-gradient-to-r from-red-900 via-red-800 to-red-900 text-white shadow-lg border-b-4 border-amber-400 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <!-- Biểu tượng dạng chữ (Typographic Monogram Avatar) & Tên đơn vị -->
+                <div class="flex items-center space-x-3.5">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 drop-shadow-md transition-transform hover:scale-105" title="Biểu tượng Công an Phường Bình Lộc">
+                        <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="capRedGradHeader" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#991B1B"/>
+                                    <stop offset="100%" stop-color="#DC2626"/>
+                                </linearGradient>
+                                <linearGradient id="capGoldGradHeader" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#FEF08A"/>
+                                    <stop offset="50%" stop-color="#FACC15"/>
+                                    <stop offset="100%" stop-color="#CA8A04"/>
+                                </linearGradient>
+                            </defs>
+                            <rect x="4" y="4" width="112" height="112" rx="24" fill="url(#capRedGradHeader)" stroke="url(#capGoldGradHeader)" stroke-width="5"/>
+                            <rect x="10" y="10" width="100" height="100" rx="19" fill="none" stroke="#FACC15" stroke-width="1.2" stroke-opacity="0.55"/>
+                            <polygon points="60,15 63.3,24.5 73.5,24.5 65.2,30.5 68.3,40 60,34.2 51.7,40 54.8,30.5 46.5,24.5 56.7,24.5" fill="#FACC15"/>
+                            <text x="60" y="67" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="27" fill="url(#capGoldGradHeader)" letter-spacing="1.5">CAP</text>
+                            <line x1="24" y1="73" x2="96" y2="73" stroke="#FACC15" stroke-width="1.5" stroke-opacity="0.7"/>
+                            <text x="60" y="88" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="12.5" fill="#FFFFFF" letter-spacing="0.8">BÌNH LỘC</text>
+                            <text x="60" y="100" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="6.4" fill="#FDE047" letter-spacing="0.3">CÔNG AN PHƯỜNG BÌNH LỘC</text>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span class="text-[11px] font-bold tracking-wider uppercase bg-amber-400 text-red-950 px-2 py-0.5 rounded">
+                                Cổng Dịch Vụ & Điều Hành Nội Bộ
+                            </span>
+                        </div>
+                        <h1 class="text-base sm:text-xl md:text-2xl font-extrabold tracking-tight text-white mt-0.5 drop-shadow-sm">
+                            CÔNG AN PHƯỜNG BÌNH LỘC
+                        </h1>
+                        <p class="text-xs sm:text-sm text-amber-200 font-medium">
+                            <i class="fa-solid fa-location-dot mr-1"></i>Khu phố Bình Lộc, phường Bình Lộc • <i class="fa-solid fa-phone mr-1"></i>Trực ban: <strong class="text-white">02513788287</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Thanh điều hướng chính -->
+                <nav class="flex flex-wrap items-center gap-2">
+                    <button onclick="switchMainTab('booking')" id="nav-booking"
+                        class="nav-btn active px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-amber-400 text-red-950 shadow">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Đặt lịch VNeID</span>
+                    </button>
+                    <button onclick="switchMainTab('chatbot')" id="nav-chatbot"
+                        class="nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-red-950/60 hover:bg-red-950 text-white border border-red-700/60">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>Trợ lý AI Thủ tục</span>
+                    </button>
+                    <button onclick="handleAdminAccess()" id="nav-admin"
+                        class="nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-950 text-amber-300 border border-amber-400/50">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span id="admin-nav-label">Quản trị Admin</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== NỘI DUNG CHÍNH ==================== -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================================== -->
+        <!-- PHÂN HỆ 1: ĐẶT LỊCH ĐỊNH DANH ĐIỆN TỬ (VNeID)              -->
+        <!-- ========================================================== -->
+        <section id="section-booking" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Cột trái: Biểu mẫu đăng ký & Tra cứu phiếu hẹn (8 cột) -->
+                <div class="lg:col-span-8 space-y-6">
+                    <!-- Thẻ Biểu mẫu Đặt lịch -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                            <div>
+                                <h2 class="text-base sm:text-lg font-extrabold flex items-center gap-2">
+                                    <i class="fa-solid fa-id-card-clip text-amber-400"></i>
+                                    <span>Đăng ký Lịch hẹn Định danh Điện tử (VNeID)</span>
+                                </h2>
+                                <p class="text-xs text-slate-300 mt-0.5">Đăng ký trực tuyến giúp giảm thời gian chờ đợi tại bộ phận tiếp dân</p>
+                            </div>
+                            <span class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-full">
+                                <i class="fa-solid fa-lock"></i> Không thu thập số CCCD
+                            </span>
+                        </div>
+
+                        <form id="booking-form" onsubmit="submitBooking(event)" class="p-6 space-y-5">
+                            <!-- Thông báo bảo mật thông tin -->
+                            <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 flex items-start gap-3 text-xs sm:text-sm text-blue-900">
+                                <i class="fa-solid fa-shield-check text-blue-600 text-base mt-0.5"></i>
+                                <div>
+                                    <strong>Bảo vệ dữ liệu cá nhân:</strong> Hệ thống trực tuyến chỉ tiếp nhận <strong>Họ tên</strong> và <strong>Số điện thoại</strong> để xếp số thứ tự. Công dân vui lòng mang theo thẻ Căn cước/CCCD gắn chip bản chính khi đến trụ sở để cán bộ đối chiếu trực tiếp.
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                        Họ và tên công dân <span class="text-red-600">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                            <i class="fa-solid fa-user"></i>
+                                        </span>
+                                        <input type="text" id="citizen-name" required placeholder="Ví dụ: Nguyễn Văn An"
+                                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none text-sm font-medium transition">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                        Số điện thoại liên hệ <span class="text-red-600">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                                            <i class="fa-solid fa-phone"></i>
+                                        </span>
+                                        <input type="tel" id="citizen-phone" required placeholder="Ví dụ: 0912345678" pattern="0[0-9]{9,10}"
+                                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none text-sm font-medium transition">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Thủ tục cần giải quyết <span class="text-red-600">*</span>
+                                </label>
+                                <select id="procedure-type" required
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none text-sm font-semibold text-slate-800 bg-white transition">
+                                    <option value="Cấp mới / Nâng mức tài khoản VNeID mức độ 2">1. Cấp mới / Nâng mức tài khoản định danh điện tử VNeID mức độ 2</option>
+                                    <option value="Kích hoạt lại tài khoản VNeID (đổi thiết bị / quên mật khẩu)">2. Kích hoạt lại tài khoản VNeID (đổi điện thoại / quên mật khẩu)</option>
+                                    <option value="Thay đổi số điện thoại đăng ký VNeID">3. Thay đổi số điện thoại đăng ký trên ứng dụng VNeID</option>
+                                    <option value="Tích hợp giấy tờ (BHYT, GPLX, Đăng ký xe, Cư trú)">4. Hướng dẫn tích hợp giấy tờ vào ví điện tử VNeID</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                        Ngày đến làm việc <span class="text-red-600">*</span>
+                                    </label>
+                                    <input type="date" id="booking-date" required onchange="updateAvailableSlots()"
+                                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none text-sm font-semibold text-slate-800 transition">
+                                    <p id="date-helper-text" class="text-[11px] text-slate-500 mt-1">
+                                        Tiếp nhận Thứ 2 - Thứ 6 (Sáng & Chiều) và Thứ 7 (Sáng).
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                        Chọn ca / Khung giờ hẹn <span class="text-red-600">*</span>
+                                    </label>
+                                    <select id="booking-slot" required
+                                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none text-sm font-semibold text-slate-800 bg-white transition">
+                                    </select>
+                                    <p id="slot-capacity-info" class="text-[11px] text-emerald-700 font-semibold mt-1"></p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                                    Ghi chú thêm (nếu có)
+                                </label>
+                                <input type="text" id="booking-note" placeholder="Ví dụ: Đi cùng người thân cao tuổi, cần hỗ trợ cài đặt..."
+                                    class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-700 focus:border-red-700 outline-none text-sm transition">
+                            </div>
+
+                            <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
+                                <span class="text-xs text-slate-500">
+                                    <i class="fa-solid fa-circle-info text-amber-500 mr-1"></i>Vui lòng đến trước giờ hẹn 10 phút.
+                                </span>
+                                <button type="submit"
+                                    class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-red-800 to-red-700 hover:from-red-900 hover:to-red-800 text-white font-extrabold text-sm rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <span>Xác nhận Đặt lịch & Xuất phiếu hẹn</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Tra cứu lịch hẹn cá nhân -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <h3 class="text-base font-extrabold text-slate-800 flex items-center gap-2 mb-3">
+                            <i class="fa-solid fa-magnifying-glass text-red-700"></i>
+                            <span>Tra cứu Phiếu hẹn của bạn</span>
+                        </h3>
+                        <div class="flex flex-col sm:flex-row gap-2.5">
+                            <input type="text" id="citizen-lookup-input" placeholder="Nhập Số điện thoại hoặc Mã phiếu hẹn (VD: BL-2026...)"
+                                class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-700 outline-none text-sm">
+                            <button onclick="lookupCitizenBooking()"
+                                class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-search"></i>
+                                <span>Kiểm tra lịch hẹn</span>
+                            </button>
+                        </div>
+                        <div id="citizen-lookup-result" class="mt-4 hidden space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- Cột phải: Thông tin trụ sở & Hướng dẫn chuẩn bị hồ sơ (4 cột) -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- Thẻ Thông tin Trụ sở kèm Biểu tượng dạng chữ -->
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-2xl p-5 shadow-md border border-slate-700">
+                        <div class="flex items-center space-x-3 mb-3.5 pb-3.5 border-b border-slate-700/80">
+                            <div class="w-12 h-12 flex-shrink-0">
+                                <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="capRedGradCard" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#991B1B"/>
+                                            <stop offset="100%" stop-color="#DC2626"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <rect x="4" y="4" width="112" height="112" rx="24" fill="url(#capRedGradCard)" stroke="#FACC15" stroke-width="5"/>
+                                    <polygon points="60,15 63.3,24.5 73.5,24.5 65.2,30.5 68.3,40 60,34.2 51.7,40 54.8,30.5 46.5,24.5 56.7,24.5" fill="#FACC15"/>
+                                    <text x="60" y="67" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="27" fill="#FACC15" letter-spacing="1.5">CAP</text>
+                                    <line x1="24" y1="73" x2="96" y2="73" stroke="#FACC15" stroke-width="1.5" stroke-opacity="0.7"/>
+                                    <text x="60" y="88" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="12.5" fill="#FFFFFF" letter-spacing="0.8">BÌNH LỘC</text>
+                                    <text x="60" y="100" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="6.4" fill="#FDE047" letter-spacing="0.3">CÔNG AN PHƯỜNG BÌNH LỘC</text>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-amber-400 text-xs uppercase tracking-wider">
+                                    Bộ phận Tiếp dân & Định danh
+                                </h4>
+                                <p class="text-white font-extrabold text-base">Công an Phường Bình Lộc</p>
+                            </div>
+                        </div>
+
+                        <ul class="space-y-3 text-xs sm:text-sm text-slate-300">
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-location-dot text-red-400 mt-1"></i>
+                                <span><strong>Địa chỉ:</strong> Khu phố Bình Lộc, phường Bình Lộc.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-clock text-amber-400 mt-1"></i>
+                                <div>
+                                    <strong>Thời gian làm việc:</strong>
+                                    <p class="text-xs text-slate-300 mt-0.5">• Thứ 2 - Thứ 6: Sáng <strong>07:30 - 11:30</strong> | Chiều <strong>13:30 - 16:30</strong></p>
+                                    <p class="text-xs text-amber-200 mt-0.5">• Thứ 7: Sáng <strong>07:30 - 11:30</strong></p>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-phone-volume text-emerald-400 mt-1"></i>
+                                <span><strong>Trực ban 24/7:</strong> <a href="tel:02513788287" class="text-amber-300 font-extrabold text-base hover:underline">02513788287</a></span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Giấy tờ công dân cần mang theo -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                        <h4 class="font-extrabold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
+                            <i class="fa-solid fa-briefcase text-red-700"></i>
+                            <span>Giấy tờ cần mang theo khi đến</span>
+                        </h4>
+                        <ul class="space-y-2.5 text-xs sm:text-sm text-slate-700">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-600 mt-1"></i>
+                                <span>Thẻ <strong>Căn cước / CCCD gắn chip</strong> bản chính còn hiệu lực.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-600 mt-1"></i>
+                                <span><strong>Điện thoại thông minh</strong> đã cài sẵn ứng dụng <strong>VNeID</strong> và sử dụng <strong>SIM chính chủ</strong>.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-circle-check text-emerald-600 mt-1"></i>
+                                <span>Bản chính các giấy tờ muốn tích hợp thêm (Giấy phép lái xe, Thẻ BHYT, Đăng ký xe...).</span>
+                            </li>
+                        </ul>
+                        <div class="mt-4 pt-3 border-t border-slate-100">
+                            <button onclick="switchMainTab('chatbot')" class="w-full py-2.5 px-3 bg-blue-50 hover:bg-blue-100 text-blue-900 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-robot text-blue-700"></i>
+                                <span>Hỏi Trợ lý AI về thủ tục hành chính</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================== -->
+        <!-- PHÂN HỆ 2: TRỢ LÝ AI HƯỚNG DẪN THỦ TỤC HÀNH CHÍNH (RAG)    -->
+        <!-- ========================================================== -->
+        <section id="section-chatbot" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Khung Chat chính (8 cột) -->
+                <div class="lg:col-span-8 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[640px] overflow-hidden">
+                    <!-- Header khung chat -->
+                    <div class="bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-700">
+                        <div class="flex items-center space-x-3">
+                            <div class="relative w-11 h-11 flex-shrink-0">
+                                <svg viewBox="0 0 120 120" class="w-full h-full drop-shadow" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="capRedGradBot" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#991B1B"/>
+                                            <stop offset="100%" stop-color="#DC2626"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <rect x="4" y="4" width="112" height="112" rx="24" fill="url(#capRedGradBot)" stroke="#FACC15" stroke-width="5"/>
+                                    <polygon points="60,15 63.3,24.5 73.5,24.5 65.2,30.5 68.3,40 60,34.2 51.7,40 54.8,30.5 46.5,24.5 56.7,24.5" fill="#FACC15"/>
+                                    <text x="60" y="67" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="27" fill="#FACC15" letter-spacing="1.5">CAP</text>
+                                    <line x1="24" y1="73" x2="96" y2="73" stroke="#FACC15" stroke-width="1.5" stroke-opacity="0.7"/>
+                                    <text x="60" y="88" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="12.5" fill="#FFFFFF" letter-spacing="0.8">BÌNH LỘC</text>
+                                    <text x="60" y="100" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="6.4" fill="#FDE047" letter-spacing="0.3">CÔNG AN PHƯỜNG BÌNH LỘC</text>
+                                </svg>
+                                <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-slate-900 rounded-full"></span>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-sm sm:text-base flex items-center gap-2">
+                                    <span>Cán bộ Trợ lý Ảo - Công an Phường Bình Lộc</span>
+                                </h3>
+                                <p class="text-[11px] text-amber-300 font-medium">
+                                    <i class="fa-solid fa-book-bookmark mr-1"></i>Chỉ trả lời theo Kho Văn bản Nội bộ (<span id="active-docs-count-badge">4</span> văn bản hiệu lực)
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="clearChat()" title="Làm mới cuộc trò chuyện"
+                            class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 font-semibold">
+                            <i class="fa-solid fa-rotate-right"></i>
+                            <span class="hidden sm:inline">Hội thoại mới</span>
+                        </button>
+                    </div>
+
+                    <!-- Khu vực hiển thị tin nhắn -->
+                    <div id="chat-messages" class="flex-1 p-5 overflow-y-auto space-y-4 bg-slate-50">
+                        <!-- Tin nhắn chào mừng -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-9 h-9 flex-shrink-0 drop-shadow-xs">
+                                <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="4" y="4" width="112" height="112" rx="24" fill="#991B1B" stroke="#FACC15" stroke-width="6"/>
+                                    <polygon points="60,15 63.3,24.5 73.5,24.5 65.2,30.5 68.3,40 60,34.2 51.7,40 54.8,30.5 46.5,24.5 56.7,24.5" fill="#FACC15"/>
+                                    <text x="60" y="68" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="28" fill="#FACC15">CAP</text>
+                                    <text x="60" y="90" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="13" fill="#FFFFFF">BÌNH LỘC</text>
+                                </svg>
+                            </div>
+                            <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-4 shadow-sm max-w-[85%] text-sm text-slate-800 leading-relaxed space-y-2">
+                                <p class="font-extrabold text-red-800">Kính chào Ông/Bà!</p>
+                                <p>Tôi là <strong>Trợ lý AI Hành chính công của Công an Phường Bình Lộc</strong> (Địa chỉ: Khu phố Bình Lộc, phường Bình Lộc • Trực ban: <strong>02513788287</strong>).</p>
+                                <p class="text-xs bg-amber-50 border border-amber-200 text-amber-950 p-2.5 rounded-xl">
+                                    <i class="fa-solid fa-shield-halved text-amber-600 mr-1"></i><strong>Nguyên tắc hoạt động:</strong> Tôi chỉ tra cứu và hướng dẫn <strong>nghiêm ngặt trong nội dung các văn bản quy định đã được Công an Phường Bình Lộc phê duyệt và đính kèm</strong> trên hệ thống.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Khung nhập câu hỏi -->
+                    <form onsubmit="handleChatSubmit(event)" class="p-3.5 bg-white border-t border-slate-200 flex items-center gap-2.5">
+                        <input type="text" id="chat-input" required placeholder="Nhập câu hỏi về thủ tục VNeID, cư trú, PCCC, giờ làm việc..."
+                            class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-800 focus:border-blue-800 outline-none text-sm">
+                        <button type="submit" id="chat-send-btn"
+                            class="px-5 py-2.5 bg-blue-900 hover:bg-blue-950 text-white font-bold text-sm rounded-xl transition flex items-center gap-2 shadow-sm">
+                            <span>Gửi</span>
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Cột phải: Câu hỏi gợi ý & Danh mục văn bản AI đang học (4 cột) -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- Gợi ý câu hỏi nhanh -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                        <h4 class="font-extrabold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2 mb-3">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                            <span>Câu hỏi thường gặp</span>
+                        </h4>
+                        <div class="space-y-2">
+                            <button onclick="askQuickQuestion('Thủ tục làm định danh điện tử VNeID mức độ 2 cần mang theo giấy tờ gì và thời gian làm việc của Công an phường ra sao?')"
+                                class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200 hover:border-red-200 text-xs font-semibold text-slate-700 hover:text-red-900 transition flex items-center justify-between gap-2">
+                                <span>1. Thủ tục & giấy tờ làm VNeID mức độ 2?</span>
+                                <i class="fa-solid fa-chevron-right text-slate-400"></i>
+                            </button>
+                            <button onclick="askQuickQuestion('Hướng dẫn đăng ký tạm trú, thường trú tại phường Bình Lộc gồm những bước nào?')"
+                                class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200 hover:border-red-200 text-xs font-semibold text-slate-700 hover:text-red-900 transition flex items-center justify-between gap-2">
+                                <span>2. Thủ tục đăng ký tạm trú / thường trú?</span>
+                                <i class="fa-solid fa-chevron-right text-slate-400"></i>
+                            </button>
+                            <button onclick="askQuickQuestion('Cách xin giấy xác nhận thông tin về cư trú (mẫu CT07) như thế nào?')"
+                                class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200 hover:border-red-200 text-xs font-semibold text-slate-700 hover:text-red-900 transition flex items-center justify-between gap-2">
+                                <span>3. Xin giấy xác nhận cư trú (Mẫu CT07)?</span>
+                                <i class="fa-solid fa-chevron-right text-slate-400"></i>
+                            </button>
+                            <button onclick="askQuickQuestion('Quy định an toàn phòng cháy chữa cháy (PCCC) đối với hộ gia đình và nhà ở kết hợp kinh doanh là gì?')"
+                                class="w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-red-50 border border-slate-200 hover:border-red-200 text-xs font-semibold text-slate-700 hover:text-red-900 transition flex items-center justify-between gap-2">
+                                <span>4. Quy định PCCC đối với hộ gia đình?</span>
+                                <i class="fa-solid fa-chevron-right text-slate-400"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách Văn bản AI đang áp dụng -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-extrabold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-folder-open text-blue-700"></i>
+                                <span>Văn bản AI đang áp dụng</span>
+                            </h4>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">
+                            Trợ lý AI chỉ sử dụng dữ liệu từ danh mục văn bản dưới đây để trả lời công dân:
+                        </p>
+                        <ul id="public-knowledge-list" class="space-y-2 text-xs">
+                            <!-- Render bằng JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================== -->
+        <!-- PHÂN HỆ 3: KHU VỰC QUẢN TRỊ ADMIN (KIỂM SOÁT TOÀN DIỆN)    -->
+        <!-- ========================================================== -->
+        <section id="section-admin" class="hidden space-y-6">
+            <!-- Thanh tiêu đề Quản trị Admin -->
+            <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-md border border-slate-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-xl bg-amber-400 text-red-950 flex items-center justify-center text-xl font-black shadow">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded">
+                                Phiên làm việc Quản trị viên
+                            </span>
+                        </div>
+                        <h2 class="text-lg sm:text-xl font-extrabold mt-0.5">Bảng Điều Khiển Quản Trị Hệ Thống</h2>
+                        <p class="text-xs text-slate-300">Công an Phường Bình Lộc • Kiểm soát lịch đăng ký, thống kê câu hỏi & Kho tri thức AI</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="logoutAdmin()"
+                        class="px-4 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Đăng xuất Admin</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Các Tab con trong Admin -->
+            <div class="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
+                <button onclick="switchAdminSubTab('appointments')" id="subtab-btn-appointments"
+                    class="admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-red-800 text-white shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>1. Thống kê & Lịch đăng ký</span>
+                </button>
+                <button onclick="switchAdminSubTab('questions')" id="subtab-btn-questions"
+                    class="admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 flex items-center gap-2">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>2. Thống kê & Lọc Câu hỏi AI</span>
+                </button>
+                <button onclick="switchAdminSubTab('knowledge')" id="subtab-btn-knowledge"
+                    class="admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 flex items-center gap-2">
+                    <i class="fa-solid fa-book-medical"></i>
+                    <span>3. Kho Tri thức AI (Văn bản đính kèm)</span>
+                </button>
+                <button onclick="switchAdminSubTab('settings')" id="subtab-btn-settings"
+                    class="admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 flex items-center gap-2">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>4. Cài đặt & Sao lưu</span>
+                </button>
+            </div>
+
+            <!-- TAB CON 3.1: THỐNG KÊ & LỌC LỊCH ĐĂNG KÝ -->
+            <div id="admin-subtab-appointments" class="space-y-6">
+                <!-- Thẻ chỉ số thống kê nhanh -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-bold text-slate-500 uppercase">Tổng lượt đăng ký</p>
+                        <p id="stat-total-bookings" class="text-2xl sm:text-3xl font-black text-slate-800 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Tất cả thời gian</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-bold text-blue-600 uppercase">Lịch hẹn Hôm nay</p>
+                        <p id="stat-today-bookings" class="text-2xl sm:text-3xl font-black text-blue-700 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-1" id="stat-today-date-label">Hôm nay</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-bold text-amber-600 uppercase">Chờ tiếp nhận</p>
+                        <p id="stat-pending-bookings" class="text-2xl sm:text-3xl font-black text-amber-600 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Đang đợi giải quyết</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-bold text-emerald-600 uppercase">Đã hoàn thành</p>
+                        <p id="stat-completed-bookings" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-1">Đã trả kết quả / kích hoạt</p>
+                    </div>
+                </div>
+
+                <!-- Biểu đồ phân bổ theo loại thủ tục -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-simple text-red-700"></i>
+                        <span>Thống kê tỷ lệ theo nhóm thủ tục VNeID</span>
+                    </h3>
+                    <div id="procedure-stats-bars" class="space-y-3 text-xs">
+                        <!-- Render bằng JS -->
+                    </div>
+                </div>
+
+                <!-- Bộ lọc & Danh sách Lịch hẹn -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-slate-200 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <h3 class="text-base font-extrabold text-slate-800">Danh sách Công dân Đăng ký Lịch hẹn</h3>
+                            <button onclick="exportBookingsCSV()"
+                                class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span>Xuất Báo cáo Excel (CSV)</span>
+                            </button>
+                        </div>
+
+                        <!-- Thanh công cụ lọc -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                            <input type="text" id="filter-booking-search" oninput="renderAdminBookingsTable()"
+                                placeholder="Tìm Tên, SĐT, Mã phiếu..."
+                                class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-red-700">
+                            <input type="date" id="filter-booking-date" onchange="renderAdminBookingsTable()"
+                                class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-red-700">
+                            <select id="filter-booking-procedure" onchange="renderAdminBookingsTable()"
+                                class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-red-700 bg-white">
+                                <option value="">-- Tất cả thủ tục --</option>
+                                <option value="Cấp mới / Nâng mức tài khoản VNeID mức độ 2">VNeID mức độ 2</option>
+                                <option value="Kích hoạt lại tài khoản VNeID (đổi thiết bị / quên mật khẩu)">Kích hoạt lại VNeID</option>
+                                <option value="Thay đổi số điện thoại đăng ký VNeID">Đổi số điện thoại</option>
+                                <option value="Tích hợp giấy tờ (BHYT, GPLX, Đăng ký xe, Cư trú)">Tích hợp giấy tờ</option>
+                            </select>
+                            <select id="filter-booking-status" onchange="renderAdminBookingsTable()"
+                                class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-red-700 bg-white">
+                                <option value="">-- Tất cả trạng thái --</option>
+                                <option value="Chờ tiếp nhận">Chờ tiếp nhận</option>
+                                <option value="Đang gọi số">Đang gọi số</option>
+                                <option value="Hoàn thành">Hoàn thành</option>
+                                <option value="Đã hủy">Đã hủy</option>
+                            </select>
+                            <button onclick="resetBookingFilters()"
+                                class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                                Xóa bộ lọc
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-extrabold uppercase text-slate-600">
+                                    <th class="py-3 px-4">Mã phiếu</th>
+                                    <th class="py-3 px-4">Họ tên & SĐT</th>
+                                    <th class="py-3 px-4">Thủ tục đăng ký</th>
+                                    <th class="py-3 px-4">Ngày & Ca hẹn</th>
+                                    <th class="py-3 px-4">Trạng thái</th>
+                                    <th class="py-3 px-4 text-right">Thao tác Cán bộ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-bookings-tbody" class="divide-y divide-slate-100 text-xs sm:text-sm">
+                                <!-- Render bằng JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB CON 3.2: THỐNG KÊ & LỌC NỘI DUNG CÂU HỎI AI -->
+            <div id="admin-subtab-questions" class="hidden space-y-6">
+                <!-- Thống kê câu hỏi -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-bold text-slate-500 uppercase">Tổng số câu hỏi công dân</p>
+                        <p id="stat-total-questions" class="text-2xl sm:text-3xl font-black text-slate-800 mt-1">0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-bold text-emerald-600 uppercase">Đã trả lời từ Kho văn bản</p>
+                        <p id="stat-answered-questions" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">0</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <p class="text-xs font-bold text-rose-600 uppercase">Ngoài phạm vi văn bản</p>
+                        <p id="stat-unanswered-questions" class="text-2xl sm:text-3xl font-black text-rose-600 mt-1">0</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Cần xem xét bổ sung văn bản mới</p>
+                    </div>
+                </div>
+
+                <!-- Bộ lọc & Danh sách câu hỏi -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-slate-200 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div>
+                                <h3 class="text-base font-extrabold text-slate-800">Nhật ký & Phân tích Câu hỏi của Công dân</h3>
+                                <p class="text-xs text-slate-500">Giúp chỉ huy và cán bộ nắm bắt nhu cầu thủ tục hành chính thực tế của nhân dân</p>
+                            </div>
+                            <button onclick="exportQuestionsCSV()"
+                                class="px-4 py-2 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-download"></i>
+                                <span>Xuất Nhật ký Câu hỏi (CSV)</span>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                            <input type="text" id="filter-question-search" oninput="renderAdminQuestionsTable()"
+                                placeholder="Lọc theo từ khóa câu hỏi..."
+                                class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-blue-700">
+                            <input type="date" id="filter-question-date" onchange="renderAdminQuestionsTable()"
+                                class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-blue-700">
+                            <select id="filter-question-status" onchange="renderAdminQuestionsTable()"
+                                class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-blue-700 bg-white">
+                                <option value="">-- Tất cả kết quả xử lý --</option>
+                                <option value="answered">Đã trả lời từ văn bản</option>
+                                <option value="out_of_scope">Ngoài phạm vi văn bản đính kèm</option>
+                            </select>
+                            <button onclick="resetQuestionFilters()"
+                                class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition">
+                                Xóa bộ lọc
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-extrabold uppercase text-slate-600">
+                                    <th class="py-3 px-4 w-40">Thời gian hỏi</th>
+                                    <th class="py-3 px-4">Nội dung câu hỏi của công dân</th>
+                                    <th class="py-3 px-4 w-48">Trạng thái phản hồi AI</th>
+                                    <th class="py-3 px-4 w-24 text-right">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-questions-tbody" class="divide-y divide-slate-100 text-xs sm:text-sm">
+                                <!-- Render bằng JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB CON 3.3: KHO TRI THỨC AI (CẬP NHẬT VĂN BẢN ĐÍNH KÈM) -->
+            <div id="admin-subtab-knowledge" class="hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Form Thêm / Cập nhật Văn bản (5 cột) -->
+                    <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 h-fit">
+                        <h3 id="doc-form-title" class="text-base font-extrabold text-slate-800 flex items-center gap-2 mb-1">
+                            <i class="fa-solid fa-file-circle-plus text-red-700"></i>
+                            <span>Thêm Văn bản mới cho AI học</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-4">
+                            Chatbot AI sẽ học và <strong>chỉ được phép trả lời</strong> dựa trên các văn bản đang bật hiệu lực tại đây.
+                        </p>
+
+                        <form id="knowledge-form" onsubmit="saveKnowledgeDoc(event)" class="space-y-4">
+                            <input type="hidden" id="doc-edit-id" value="">
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">
+                                    Tên / Tiêu đề văn bản <span class="text-red-600">*</span>
+                                </label>
+                                <input type="text" id="doc-title" required placeholder="VD: Quy trình cấp VNeID mức 2 tại CAP Bình Lộc"
+                                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-red-700 outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-700 mb-1">
+                                    Số hiệu / Ký hiệu / Ngày ban hành
+                                </label>
+                                <input type="text" id="doc-code" placeholder="VD: Hướng dẫn số 12/HD-CAP ngày 10/01/2026"
+                                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-red-700 outline-none">
+                            </div>
+
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-xs font-bold uppercase text-slate-700">
+                                        Nội dung chi tiết văn bản <span class="text-red-600">*</span>
+                                    </label>
+                                    <label class="cursor-pointer text-[11px] font-bold text-blue-700 hover:underline flex items-center gap-1">
+                                        <i class="fa-solid fa-upload"></i>
+                                        <span>Nạp từ tệp .TXT / .MD</span>
+                                        <input type="file" accept=".txt,.md,.csv" onchange="importTextFileToDoc(event)" class="hidden">
+                                    </label>
+                                </div>
+                                <textarea id="doc-content" rows="8" required placeholder="Dán toàn văn quy định, các bước thực hiện, giấy tờ cần thiết, lệ phí, thời hạn giải quyết..."
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:ring-2 focus:ring-red-700 outline-none leading-relaxed"></textarea>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="doc-active" checked class="w-4 h-4 text-red-700 rounded">
+                                <label for="doc-active" class="text-xs font-semibold text-slate-700">Kích hoạt hiệu lực ngay cho Trợ lý AI</label>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-2">
+                                <button type="submit"
+                                    class="flex-1 py-2.5 px-4 bg-red-800 hover:bg-red-900 text-white font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    <span id="doc-submit-btn-text">Lưu & Huấn luyện AI</span>
+                                </button>
+                                <button type="button" id="doc-cancel-edit-btn" onclick="cancelEditDoc()" class="hidden py-2.5 px-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl">
+                                    Hủy
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Danh sách Văn bản đã đính kèm (7 cột) -->
+                    <div class="lg:col-span-7 space-y-4">
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-950 flex items-start gap-3">
+                            <i class="fa-solid fa-circle-exclamation text-amber-600 text-base mt-0.5"></i>
+                            <div>
+                                <strong>Cơ chế Ràng buộc Tri thức Nghiêm ngặt:</strong> Khi có câu hỏi từ người dân, AI chỉ trích xuất thông tin từ danh sách văn bản có trạng thái <span class="font-bold text-emerald-700">Đang áp dụng</span> bên dưới. Nếu Admin tắt hoặc xóa một văn bản, AI sẽ ngừng trả lời các nội dung thuộc văn bản đó.
+                            </div>
+                        </div>
+
+                        <div id="admin-knowledge-list" class="space-y-3">
+                            <!-- Render bằng JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB CON 3.4: CÀI ĐẶT HỆ THỐNG & SAO LƯU -->
+            <div id="admin-subtab-settings" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Đổi mật khẩu & Cấu hình số lượt/ca -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+                        <h3 class="text-base font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <i class="fa-solid fa-sliders text-red-700"></i>
+                            <span>Cấu hình Vận hành & Bảo mật Admin</span>
+                        </h3>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">
+                                Giới hạn số lượt công dân tối đa mỗi ca làm việc
+                            </label>
+                            <div class="flex gap-2">
+                                <input type="number" id="setting-max-slots" min="5" max="200" value="25"
+                                    class="w-32 px-3.5 py-2 rounded-xl border border-slate-300 text-sm font-bold">
+                                <button onclick="saveSystemSettings()"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition">
+                                    Cập nhật định mức
+                                </button>
+                            </div>
+                        </div>
+
+                        <form onsubmit="changeAdminPassword(event)" class="pt-4 border-t border-slate-100 space-y-3">
+                            <h4 class="text-xs font-extrabold uppercase text-slate-700">Đổi mật khẩu Quản trị viên</h4>
+                            <div>
+                                <input type="password" id="new-admin-pass" required minlength="4" placeholder="Nhập mật khẩu Admin mới (tối thiểu 4 ký tự)"
+                                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+                            </div>
+                            <div>
+                                <input type="password" id="confirm-admin-pass" required minlength="4" placeholder="Xác nhận lại mật khẩu Admin mới"
+                                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-sm">
+                            </div>
+                            <button type="submit"
+                                class="px-4 py-2.5 bg-red-800 hover:bg-red-900 text-white text-xs font-bold rounded-xl transition">
+                                Lưu Mật khẩu Mới
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Sao lưu & Phục hồi dữ liệu JSON -->
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+                        <h3 class="text-base font-extrabold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <i class="fa-solid fa-database text-blue-700"></i>
+                            <span>Sao lưu & Đồng bộ Dữ liệu Hệ thống</span>
+                        </h3>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Toàn bộ dữ liệu lịch đăng ký, nhật ký câu hỏi AI và kho văn bản pháp quy được lưu trữ an toàn trên trình duyệt. Bạn có thể xuất tệp sao lưu <strong>.JSON</strong> để lưu trữ dự phòng hoặc nạp sang máy tính trực ban khác.
+                        </p>
+
+                        <div class="space-y-3">
+                            <button onclick="exportFullBackupJSON()"
+                                class="w-full py-3 px-4 bg-blue-900 hover:bg-blue-950 text-white font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-down"></i>
+                                <span>Tải xuống Tệp Sao lưu Toàn bộ (.JSON)</span>
+                            </button>
+
+                            <label class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm rounded-xl transition flex items-center justify-center gap-2 cursor-pointer border border-slate-300">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Khôi phục Dữ liệu từ Tệp (.JSON)</span>
+                                <input type="file" accept=".json" onchange="importFullBackupJSON(event)" class="hidden">
+                            </label>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100">
+                            <button onclick="resetDefaultKnowledge()"
+                                class="text-xs text-red-700 hover:underline font-semibold flex items-center gap-1">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Khôi phục 4 văn bản mẫu ban đầu của Công an Phường Bình Lộc</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="bg-slate-900 text-slate-400 border-t-4 border-red-800 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+                <div class="text-center md:text-left">
+                    <p class="text-white font-extrabold text-sm">CÔNG AN PHƯỜNG BÌNH LỘC</p>
+                    <p class="mt-0.5">Địa chỉ: Khu phố Bình Lộc, phường Bình Lộc • Điện thoại trực ban: <strong class="text-amber-400">02513788287</strong></p>
+                </div>
+                <div class="text-center md:text-right text-slate-400">
+                    <p>Hệ thống Đặt lịch Định danh Điện tử & Trợ lý AI Hành chính công</p>
+                    <p class="mt-0.5 text-[11px] text-slate-500">Phục vụ nhân dân tận tụy, chính xác, bảo mật thông tin</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== MODAL ĐĂNG NHẬP ADMIN ==================== -->
+    <div id="admin-login-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+            <div class="bg-gradient-to-r from-red-900 to-slate-900 text-white p-5 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-shield-halved text-amber-400 text-xl"></i>
+                    <h3 class="font-extrabold text-base">Xác thực Quyền Quản trị Admin</h3>
+                </div>
+                <button onclick="closeAdminLoginModal()" class="text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="verifyAdminLogin(event)" class="p-6 space-y-4">
+                <p class="text-xs text-slate-600">
+                    Vui lòng nhập mật khẩu quản trị của <strong>Công an Phường Bình Lộc</strong> để truy cập khu vực thống kê và cập nhật Kho tri thức AI.
+                </p>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-700 mb-1.5">Mật khẩu Quản trị</label>
+                    <input type="password" id="admin-password-input" required placeholder="Nhập mật khẩu (Mặc định: 123456)"
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-red-700 outline-none text-sm font-bold">
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeAdminLoginModal()"
+                        class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">
+                        Đóng
+                    </button>
+                    <button type="submit"
+                        class="px-5 py-2.5 bg-red-800 hover:bg-red-900 text-white text-xs font-extrabold rounded-xl shadow">
+                        Đăng nhập Quản trị
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL PHIẾU HẸN ĐIỆN TỬ ==================== -->
+    <div id="ticket-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div id="ticket-modal-content" class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 my-auto">
+            <!-- Header phiếu -->
+            <div class="bg-gradient-to-r from-red-800 to-red-900 text-white p-5 text-center border-b-4 border-amber-400 relative">
+                <button onclick="closeTicketModal()" class="no-print absolute top-3 right-3 w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="flex flex-col items-center justify-center">
+                    <div class="w-12 h-12 mb-1.5 drop-shadow">
+                        <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="112" height="112" rx="24" fill="#991B1B" stroke="#FACC15" stroke-width="5"/>
+                            <polygon points="60,15 63.3,24.5 73.5,24.5 65.2,30.5 68.3,40 60,34.2 51.7,40 54.8,30.5 46.5,24.5 56.7,24.5" fill="#FACC15"/>
+                            <text x="60" y="67" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="27" fill="#FACC15" letter-spacing="1.5">CAP</text>
+                            <line x1="24" y1="73" x2="96" y2="73" stroke="#FACC15" stroke-width="1.5" stroke-opacity="0.7"/>
+                            <text x="60" y="88" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="12.5" fill="#FFFFFF" letter-spacing="0.8">BÌNH LỘC</text>
+                            <text x="60" y="100" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="6.4" fill="#FDE047" letter-spacing="0.3">CÔNG AN PHƯỜNG BÌNH LỘC</text>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-extrabold tracking-wide">CÔNG AN PHƯỜNG BÌNH LỘC</h3>
+                    <p class="text-[11px] text-amber-200 mt-0.5">Khu phố Bình Lộc, phường Bình Lộc • Trực ban: 02513788287</p>
+                    <div class="inline-block mt-2.5 px-3.5 py-1 bg-amber-400 text-red-950 font-extrabold text-xs rounded-full uppercase">
+                        Phiếu Hẹn Giải Quyết Định Danh Điện Tử
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nội dung phiếu -->
+            <div class="p-6 space-y-4">
+                <div class="flex items-center justify-between bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                    <div>
+                        <p class="text-[11px] uppercase font-bold text-slate-500">Mã số phiếu hẹn</p>
+                        <p id="ticket-code" class="text-lg font-black text-red-800 tracking-wider">BL-000000</p>
+                        <span id="ticket-status-badge" class="inline-block mt-1 text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800">
+                            Chờ tiếp nhận
+                        </span>
+                    </div>
+                    <div id="ticket-qrcode" class="bg-white p-1.5 rounded-lg border border-slate-200"></div>
+                </div>
+
+                <div class="space-y-2.5 text-xs sm:text-sm">
+                    <div class="flex justify-between py-1.5 border-b border-slate-100">
+                        <span class="text-slate-500">Họ và tên công dân:</span>
+                        <span id="ticket-name" class="font-extrabold text-slate-900"></span>
+                    </div>
+                    <div class="flex justify-between py-1.5 border-b border-slate-100">
+                        <span class="text-slate-500">Số điện thoại liên hệ:</span>
+                        <span id="ticket-phone" class="font-bold text-slate-800"></span>
+                    </div>
+                    <div class="flex justify-between py-1.5 border-b border-slate-100 gap-4">
+                        <span class="text-slate-500 flex-shrink-0">Thủ tục đăng ký:</span>
+                        <span id="ticket-procedure" class="font-bold text-red-800 text-right"></span>
+                    </div>
+                    <div class="flex justify-between py-1.5 border-b border-slate-100">
+                        <span class="text-slate-500">Thời gian hẹn:</span>
+                        <span id="ticket-datetime" class="font-extrabold text-blue-900"></span>
+                    </div>
+                    <div class="flex justify-between py-1.5">
+                        <span class="text-slate-500">Địa điểm tiếp nhận:</span>
+                        <span class="font-semibold text-slate-800 text-right">Trụ sở Công an P. Bình Lộc</span>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-950 leading-relaxed">
+                    <strong>Lưu ý quan trọng:</strong> Công dân vui lòng xuất trình mã QR này tại bàn tiếp dân và mang theo <strong>CCCD/Căn cước bản chính</strong> cùng <strong>điện thoại sử dụng SIM chính chủ</strong>.
+                </div>
+
+                <div class="no-print flex items-center gap-2.5 pt-2">
+                    <button onclick="window.print()"
+                        class="flex-1 py-2.5 px-4 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print"></i>
+                        <span>In / Lưu PDF Phiếu hẹn</span>
+                    </button>
+                    <button onclick="closeTicketModal()"
+                        class="py-2.5 px-4 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-xl transition">
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== THÔNG BÁO TOAST ==================== -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        // ==================== 1. DỮ LIỆU MẶC ĐỊNH & LOCALSTORAGE ====================
+        const STORAGE_KEYS = {
+            BOOKINGS: 'cap_binh_loc_bookings_v2',
+            QUESTIONS: 'cap_binh_loc_questions_v2',
+            KNOWLEDGE: 'cap_binh_loc_knowledge_v2',
+            SETTINGS: 'cap_binh_loc_settings_v2',
+            ADMIN_SESSION: 'cap_binh_loc_admin_logged_in'
+        };
+
+        const DEFAULT_KNOWLEDGE_DOCS = [
+            {
+                id: 'doc-1',
+                title: 'Quy trình cấp & kích hoạt tài khoản Định danh điện tử VNeID mức độ 2',
+                code: 'Hướng dẫn Công an Phường Bình Lộc',
+                active: true,
+                updatedAt: '2026-01-15',
+                content: `1. Địa điểm và thời gian tiếp nhận:
+- Địa điểm: Trụ sở Công an Phường Bình Lộc, địa chỉ Khu phố Bình Lộc, phường Bình Lộc. Số điện thoại trực ban hỗ trợ: 02513788287.
+- Thời gian làm việc: Từ Thứ Hai đến Thứ Sáu (Buổi sáng từ 07:30 đến 11:30; Buổi chiều từ 13:30 đến 16:30) và sáng Thứ Bảy (từ 07:30 đến 11:30). Nghỉ chiều Thứ Bảy và Chủ Nhật.
+
+2. Giấy tờ công dân cần chuẩn bị:
+- Thẻ Căn cước hoặc Căn cước công dân (CCCD) gắn chip bản chính còn thời hạn sử dụng.
+- Điện thoại thông minh đã tải sẵn ứng dụng VNeID (từ App Store hoặc CH Play) và sử dụng số điện thoại đăng ký chính chủ của công dân.
+- Các giấy tờ bản chính cần tích hợp thêm vào ví VNeID (nếu có): Giấy phép lái xe, Giấy đăng ký xe, Thẻ Bảo hiểm y tế (BHYT), Giấy khai sinh của con dưới 14 tuổi.
+
+3. Quy trình thực hiện:
+- Bước 1: Công dân đặt lịch hẹn trực tuyến hoặc lấy số thứ tự trực tiếp tại bộ phận tiếp dân Công an Phường Bình Lộc.
+- Bước 2: Cán bộ Công an tiếp nhận thẻ Căn cước/CCCD, nhập thông tin vào hệ thống định danh, chụp ảnh chân dung và thu nhận vân tay.
+- Bước 3: Công dân kiểm tra phiếu thu nhận thông tin, ký xác nhận.
+- Bước 4: Sau khi Cục Cảnh sát QLHC về TTXH phê duyệt (thường từ 1 đến 3 ngày làm việc), hệ thống gửi tin nhắn SMS thông báo. Công dân mở ứng dụng VNeID chọn "Kích hoạt tài khoản định danh điện tử" và làm theo hướng dẫn.`
+            },
+            {
+                id: 'doc-2',
+                title: 'Thủ tục Đăng ký Thường trú và Đăng ký Tạm trú tại Phường Bình Lộc',
+                code: 'Luật Cư trú & Thông tư hướng dẫn',
+                active: true,
+                updatedAt: '2026-01-15',
+                content: `1. Đăng ký Thường trú:
+- Điều kiện: Công dân có chỗ ở hợp pháp thuộc quyền sở hữu của mình hoặc được chủ hộ/chủ sở hữu chỗ ở hợp pháp đồng ý cho đăng ký thường trú (đối với người thân hoặc người thuê, mượn, ở nhờ).
+- Hồ sơ gồm: Tờ khai thay đổi thông tin cư trú (Mẫu CT01); Giấy tờ, tài liệu chứng minh việc sở hữu chỗ ở hợp pháp (Sổ hồng, Sổ đỏ, Hợp đồng mua bán nhà ở...). Trường hợp ở nhờ/thuê nhà cần có sự đồng ý của chủ hộ/chủ sở hữu trên Mẫu CT01 hoặc qua ứng dụng VNeID.
+
+2. Đăng ký Tạm trú:
+- Đối tượng: Công dân đến sinh sống tại chỗ ở hợp pháp ngoài phạm vi đơn vị hành chính cấp xã nơi đã đăng ký thường trú để lao động, học tập hoặc vì mục đích khác từ 30 ngày trở lên phải đăng ký tạm trú trong thời hạn 30 ngày kể từ ngày đến.
+- Hồ sơ gồm: Tờ khai thay đổi thông tin cư trú (Mẫu CT01); Giấy tờ chứng minh chỗ ở hợp pháp (Hợp đồng thuê nhà, giấy tờ nhà đất...). Thời hạn tạm trú tối đa là 02 năm và có thể gia hạn nhiều lần.
+
+3. Hình thức nộp hồ sơ:
+- Nộp trực tuyến qua Cổng Dịch vụ công Quốc gia (dichvucong.gov.vn) hoặc ứng dụng VNeID để tiết kiệm thời gian.
+- Hoặc nộp trực tiếp tại Công an Phường Bình Lộc (Khu phố Bình Lộc, phường Bình Lộc) trong giờ hành chính.`
+            },
+            {
+                id: 'doc-3',
+                title: 'Thủ tục Cấp Giấy xác nhận thông tin về cư trú (Mẫu CT07)',
+                code: 'Quy định Cư trú nội bộ',
+                active: true,
+                updatedAt: '2026-01-15',
+                content: `1. Mục đích sử dụng:
+- Giấy xác nhận thông tin về cư trú (Mẫu CT07) dùng để chứng minh thông tin về nơi thường trú, tạm trú, thời gian cư trú, các thành viên trong hộ gia đình khi thực hiện các giao dịch dân sự, ngân hàng, đất đai, xin việc làm...
+
+2. Cách thức thực hiện:
+- Cách 1 (Khuyến khích): Công dân đăng nhập Cổng Dịch vụ công Bộ Công an hoặc ứng dụng VNeID -> chọn mục "Thủ tục hành chính" -> chọn "Xác nhận thông tin về cư trú", điền thông tin và chọn cơ quan tiếp nhận là Công an Phường Bình Lộc.
+- Cách 2: Nộp trực tiếp tại Công an Phường Bình Lộc (Khu phố Bình Lộc, phường Bình Lộc), xuất trình thẻ Căn cước/CCCD bản chính và điền Tờ khai Mẫu CT01.
+
+3. Thời hạn giải quyết:
+- Trong thời hạn 01 ngày làm việc kể từ ngày nhận được hồ sơ hợp lệ (trường hợp cần xác minh nhiều nơi không quá 03 ngày làm việc). Lệ phí: Miễn phí theo quy định hiện hành.`
+            },
+            {
+                id: 'doc-4',
+                title: 'Quy định An toàn Phòng cháy chữa cháy (PCCC) đối với Hộ gia đình',
+                code: 'Khuyến cáo PCCC - CAP Bình Lộc',
+                active: true,
+                updatedAt: '2026-01-15',
+                content: `Công an Phường Bình Lộc khuyến cáo các hộ gia đình và nhà ở kết hợp sản xuất, kinh doanh trên địa bàn thực hiện nghiêm các quy định an toàn PCCC sau:
+1. Trang bị phương tiện PCCC tại chỗ:
+- Mỗi hộ gia đình trang bị tối thiểu 01 bình chữa cháy xách tay (bình bột ABC hoặc bình khí CO2) đặt ở nơi dễ thấy, dễ lấy.
+- Trang bị dụng cụ phá dỡ thô sơ (búa, rìu, kìm cộng lực) và mặt nạ lọc độc phòng khói.
+
+2. Mở lối thoát nạn thứ 2:
+- Đối với nhà ở có ban công, lô gia, sân thượng hoặc "chuồng cọp" rào sắt kiên cố: Bắt buộc phải mở ô cửa thoát nạn thứ 2 có kích thước tối thiểu 0,6m x 0,8m, có khóa mở từ bên trong và đặt chìa khóa tại vị trí cố định dễ lấy.
+
+3. An toàn sử dụng điện, gas và nguồn nhiệt:
+- Không câu móc điện tùy tiện, không cắm nhiều thiết bị công suất lớn vào cùng một ổ cắm; tắt cầu dao/aptomat khi ra khỏi nhà.
+- Khóa van bình gas sau khi đun nấu; không để vật liệu dễ cháy gần bếp lửa, bàn thờ thắp hương.
+- Khi xảy ra sự cố cháy nổ, báo ngay cho lực lượng Cảnh sát PCCC qua số 114 hoặc Trực ban Công an Phường Bình Lộc qua số 02513788287.`
+            }
+        ];
+
+        // Khởi tạo dữ liệu trong bộ nhớ
+        let bookings = [];
+        let questionsLog = [];
+        let knowledgeDocs = [];
+        let systemSettings = {
+            adminPassword: '123456',
+            maxSlotsPerShift: 25
+        };
+        let chatHistory = [];
+        let isAdminLoggedIn = false;
+
+        // ==================== 2. KHỞI TẠO ỨNG DỤNG ====================
+        window.onload = function () {
+            loadAllDataFromStorage();
+            initBookingDateDefaults();
+            renderPublicKnowledgeList();
+            updateAdminNavUI();
+            if (isAdminLoggedIn) {
+                refreshAdminDashboard();
+            }
+        };
+
+        function loadAllDataFromStorage() {
+            try {
+                const savedBookings = localStorage.getItem(STORAGE_KEYS.BOOKINGS);
+                bookings = savedBookings ? JSON.parse(savedBookings) : getSampleBookings();
+                if (!savedBookings) saveBookings();
+
+                const savedQuestions = localStorage.getItem(STORAGE_KEYS.QUESTIONS);
+                questionsLog = savedQuestions ? JSON.parse(savedQuestions) : getSampleQuestions();
+                if (!savedQuestions) saveQuestionsLog();
+
+                const savedKnowledge = localStorage.getItem(STORAGE_KEYS.KNOWLEDGE);
+                knowledgeDocs = savedKnowledge ? JSON.parse(savedKnowledge) : JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_DOCS));
+                if (!savedKnowledge) saveKnowledgeDocs();
+
+                const savedSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+                if (savedSettings) {
+                    systemSettings = { ...systemSettings, ...JSON.parse(savedSettings) };
+                } else {
+                    saveSettings();
+                }
+
+                isAdminLoggedIn = sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION) === 'true';
+            } catch (err) {
+                console.error('Lỗi tải dữ liệu:', err);
+                bookings = [];
+                questionsLog = [];
+                knowledgeDocs = JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_DOCS));
+            }
+        }
+
+        function saveBookings() {
+            localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(bookings));
+        }
+
+        function saveQuestionsLog() {
+            localStorage.setItem(STORAGE_KEYS.QUESTIONS, JSON.stringify(questionsLog));
+        }
+
+        function saveKnowledgeDocs() {
+            localStorage.setItem(STORAGE_KEYS.KNOWLEDGE, JSON.stringify(knowledgeDocs));
+            renderPublicKnowledgeList();
+        }
+
+        function saveSettings() {
+            localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(systemSettings));
+        }
+
+        function getTodayISO() {
+            const now = new Date();
+            const offset = now.getTimezoneOffset() * 60000;
+            return new Date(now - offset).toISOString().split('T')[0];
+        }
+
+        function getSampleBookings() {
+            const today = getTodayISO();
+            return [
+                {
+                    id: 'BL-2601',
+                    name: 'Trần Minh Quân',
+                    phone: '0918456789',
+                    procedure: 'Cấp mới / Nâng mức tài khoản VNeID mức độ 2',
+                    date: today,
+                    slot: 'Ca Sáng (07:30 - 11:30)',
+                    note: 'Nâng cấp tài khoản mức 2',
+                    status: 'Chờ tiếp nhận',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 'BL-2602',
+                    name: 'Lê Thị Thu Hà',
+                    phone: '0937112233',
+                    procedure: 'Kích hoạt lại tài khoản VNeID (đổi thiết bị / quên mật khẩu)',
+                    date: today,
+                    slot: 'Ca Sáng (07:30 - 11:30)',
+                    note: 'Mới đổi điện thoại',
+                    status: 'Hoàn thành',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+        }
+
+        function getSampleQuestions() {
+            return [
+                {
+                    id: 'q-1',
+                    question: 'Làm định danh điện tử VNeID mức 2 cần mang theo giấy tờ gì?',
+                    status: 'answered',
+                    matchedDoc: 'Quy trình cấp & kích hoạt tài khoản Định danh điện tử VNeID mức độ 2',
+                    timestamp: new Date().toISOString()
+                },
+                {
+                    id: 'q-2',
+                    question: 'Thứ 7 Công an phường Bình Lộc có làm việc buổi chiều không?',
+                    status: 'answered',
+                    matchedDoc: 'Quy trình cấp & kích hoạt tài khoản Định danh điện tử VNeID mức độ 2',
+                    timestamp: new Date().toISOString()
+                }
+            ];
+        }
+
+        // ==================== 3. ĐIỀU HƯỚNG TAB CHÍNH ====================
+        function switchMainTab(tabName) {
+            const sections = ['booking', 'chatbot', 'admin'];
+            sections.forEach(sec => {
+                const el = document.getElementById(`section-${sec}`);
+                const btn = document.getElementById(`nav-${sec}`);
+                if (sec === tabName) {
+                    el.classList.remove('hidden');
+                    if (sec === 'admin') {
+                        btn.className = 'nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-amber-400 text-red-950 shadow';
+                    } else {
+                        btn.className = 'nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-amber-400 text-red-950 shadow';
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    if (sec === 'admin') {
+                        btn.className = 'nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-slate-900/90 hover:bg-slate-950 text-amber-300 border border-amber-400/50';
+                    } else {
+                        btn.className = 'nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-red-950/60 hover:bg-red-950 text-white border border-red-700/60';
+                    }
+                }
+            });
+
+            if (tabName === 'admin' && isAdminLoggedIn) {
+                refreshAdminDashboard();
+            }
+        }
+
+        // ==================== 4. PHÂN HỆ ĐẶT LỊCH VNeID ====================
+        function initBookingDateDefaults() {
+            const dateInput = document.getElementById('booking-date');
+            const today = getTodayISO();
+            dateInput.min = today;
+
+            // Chọn ngày làm việc hợp lệ gần nhất (bỏ qua Chủ nhật)
+            let d = new Date();
+            if (d.getDay() === 0) {
+                d.setDate(d.getDate() + 1);
+            }
+            const offset = d.getTimezoneOffset() * 60000;
+            dateInput.value = new Date(d - offset).toISOString().split('T')[0];
+            updateAvailableSlots();
+        }
+
+        function updateAvailableSlots() {
+            const dateInput = document.getElementById('booking-date');
+            const slotSelect = document.getElementById('booking-slot');
+            const helperText = document.getElementById('date-helper-text');
+            const capInfo = document.getElementById('slot-capacity-info');
+
+            if (!dateInput.value) return;
+
+            const parts = dateInput.value.split('-');
+            const selectedDate = new Date(parts[0], parts[1] - 1, parts[2]);
+            const dayOfWeek = selectedDate.getDay(); // 0 = CN, 6 = Thứ 7
+
+            slotSelect.innerHTML = '';
+
+            if (dayOfWeek === 0) {
+                // Chủ nhật nghỉ
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = '-- Chủ Nhật đơn vị nghỉ tiếp nhận hồ sơ --';
+                slotSelect.appendChild(opt);
+                slotSelect.disabled = true;
+                helperText.innerHTML = '<span class="text-red-600 font-bold">Chủ Nhật nghỉ làm việc. Vui lòng chọn Thứ 2 đến Thứ 7.</span>';
+                capInfo.textContent = '';
+                return;
+            }
+
+            slotSelect.disabled = false;
+            const maxCap = parseInt(systemSettings.maxSlotsPerShift, 10) || 25;
+
+            const availableShifts = ['Ca Sáng (07:30 - 11:30)'];
+            if (dayOfWeek !== 6) {
+                // Thứ 2 đến Thứ 6 có thêm ca chiều
+                availableShifts.push('Ca Chiều (13:30 - 16:30)');
+                helperText.textContent = 'Ngày làm việc hành chính (Sáng 07:30-11:30 | Chiều 13:30-16:30).';
+            } else {
+                helperText.innerHTML = '<span class="text-amber-700 font-semibold">Thứ Bảy chỉ làm việc buổi sáng từ 07:30 đến 11:30.</span>';
+            }
+
+            availableShifts.forEach(shift => {
+                const count = bookings.filter(b => b.date === dateInput.value && b.slot === shift && b.status !== 'Đã hủy').length;
+                const remaining = Math.max(0, maxCap - count);
+                const opt = document.createElement('option');
+                opt.value = shift;
+                opt.textContent = `${shift} — Còn ${remaining}/${maxCap} lượt`;
+                if (remaining === 0) {
+                    opt.disabled = true;
+                    opt.textContent += ' (Đã đủ lượt)';
+                }
+                slotSelect.appendChild(opt);
+            });
+
+            capInfo.textContent = `Định mức tiếp nhận tối đa ${maxCap} công dân/ca làm việc.`;
+        }
+
+        function submitBooking(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('citizen-name').value.trim();
+            const phone = document.getElementById('citizen-phone').value.trim();
+            const procedure = document.getElementById('procedure-type').value;
+            const date = document.getElementById('booking-date').value;
+            const slot = document.getElementById('booking-slot').value;
+            const note = document.getElementById('booking-note').value.trim();
+
+            if (!slot) {
+                showToast('Vui lòng chọn ngày và ca làm việc hợp lệ (không chọn Chủ Nhật).', 'error');
+                return;
+            }
+
+            const maxCap = parseInt(systemSettings.maxSlotsPerShift, 10) || 25;
+            const currentCount = bookings.filter(b => b.date === date && b.slot === slot && b.status !== 'Đã hủy').length;
+            if (currentCount >= maxCap) {
+                showToast('Ca làm việc này đã đủ số lượng tiếp nhận. Vui lòng chọn ca hoặc ngày khác.', 'error');
+                return;
+            }
+
+            const randomCode = 'BL-' + Math.floor(100000 + Math.random() * 900000);
+            const newBooking = {
+                id: randomCode,
+                name,
+                phone,
+                procedure,
+                date,
+                slot,
+                note,
+                status: 'Chờ tiếp nhận',
+                createdAt: new Date().toISOString()
+            };
+
+            bookings.unshift(newBooking);
+            saveBookings();
+            updateAvailableSlots();
+
+            // Reset một phần form
+            document.getElementById('citizen-name').value = '';
+            document.getElementById('citizen-phone').value = '';
+            document.getElementById('booking-note').value = '';
+
+            showToast('Đặt lịch hẹn định danh điện tử thành công!', 'success');
+            openTicketModal(newBooking);
+        }
+
+        function openTicketModal(booking) {
+            document.getElementById('ticket-code').textContent = booking.id;
+            document.getElementById('ticket-name').textContent = booking.name;
+            document.getElementById('ticket-phone').textContent = booking.phone;
+            document.getElementById('ticket-procedure').textContent = booking.procedure;
+            document.getElementById('ticket-datetime').textContent = `${formatDateVN(booking.date)} | ${booking.slot}`;
+
+            const badge = document.getElementById('ticket-status-badge');
+            badge.textContent = booking.status;
+
+            // Tạo mã QR
+            const qrContainer = document.getElementById('ticket-qrcode');
+            qrContainer.innerHTML = '';
+            const qrPayload = `CAP_BINH_LOC|MA:${booking.id}|TEN:${booking.name}|SDT:${booking.phone}|NGAY:${booking.date}|CA:${booking.slot}`;
+            try {
+                new QRCode(qrContainer, {
+                    text: qrPayload,
+                    width: 84,
+                    height: 84,
+                    colorDark: '#1e293b',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (e) {
+                qrContainer.innerHTML = `<div class="text-[10px] font-mono p-2 text-center">${booking.id}</div>`;
+            }
+
+            document.getElementById('ticket-modal').classList.remove('hidden');
+        }
+
+        function closeTicketModal() {
+            document.getElementById('ticket-modal').classList.add('hidden');
+        }
+
+        function lookupCitizenBooking() {
+            const query = document.getElementById('citizen-lookup-input').value.trim().toLowerCase();
+            const resultBox = document.getElementById('citizen-lookup-result');
+
+            if (!query) {
+                showToast('Vui lòng nhập Số điện thoại hoặc Mã phiếu hẹn để tra cứu.', 'warning');
+                return;
+            }
+
+            const matches = bookings.filter(b =>
+                b.phone.toLowerCase().includes(query) || b.id.toLowerCase().includes(query)
+            );
+
+            resultBox.classList.remove('hidden');
+            if (matches.length === 0) {
+                resultBox.innerHTML = `
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 text-center">
+                        Không tìm thấy phiếu hẹn nào khớp với thông tin <strong>"${escapeHTML(query)}"</strong>.
+                    </div>
+                `;
+                return;
+            }
+
+            resultBox.innerHTML = matches.map(b => `
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-red-800 text-xs">${escapeHTML(b.id)}</span>
+                            <span class="text-xs font-bold text-slate-800">• ${escapeHTML(b.name)}</span>
+                            <span class="text-[11px] px-2 py-0.5 rounded-full font-bold ${getStatusBadgeClass(b.status)}">${escapeHTML(b.status)}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-1">${escapeHTML(b.procedure)}</p>
+                        <p class="text-[11px] font-semibold text-blue-900 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${formatDateVN(b.date)} — ${escapeHTML(b.slot)}</p>
+                    </div>
+                    <button onclick='openTicketModal(${JSON.stringify(b).replace(/'/g, "&#39;")})'
+                        class="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 font-bold text-xs rounded-lg transition self-start sm:self-center">
+                        Xem Phiếu QR
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // ==================== 5. PHÂN HỆ TRỢ LÝ AI (RAG NGHIÊM NGẶT) ====================
+        function renderPublicKnowledgeList() {
+            const listEl = document.getElementById('public-knowledge-list');
+            const badgeEl = document.getElementById('active-docs-count-badge');
+            const activeDocs = knowledgeDocs.filter(d => d.active);
+
+            if (badgeEl) badgeEl.textContent = activeDocs.length;
+            if (!listEl) return;
+
+            if (activeDocs.length === 0) {
+                listEl.innerHTML = `<li class="text-slate-400 italic">Hiện chưa có văn bản nào được kích hoạt.</li>`;
+                return;
+            }
+
+            listEl.innerHTML = activeDocs.map(doc => `
+                <li class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-2">
+                    <i class="fa-solid fa-file-lines text-red-700 mt-0.5"></i>
+                    <div>
+                        <p class="font-bold text-slate-800 leading-snug">${escapeHTML(doc.title)}</p>
+                        <p class="text-[11px] text-slate-500 mt-0.5">${escapeHTML(doc.code || 'Văn bản nội bộ')}</p>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        function askQuickQuestion(questionText) {
+            const input = document.getElementById('chat-input');
+            input.value = questionText;
+            handleChatSubmit(new Event('submit'));
+        }
+
+        async function handleChatSubmit(event) {
+            event.preventDefault();
+            const inputEl = document.getElementById('chat-input');
+            const userQuestion = inputEl.value.trim();
+            if (!userQuestion) return;
+
+            inputEl.value = '';
+            appendChatMessage('user', userQuestion, false);
+
+            const typingId = appendTypingIndicator();
+            const activeDocs = knowledgeDocs.filter(d => d.active);
+
+            // Tạo ngữ cảnh văn bản đính kèm
+            const knowledgeContext = activeDocs.map((d, idx) =>
+                `--- VĂN BẢN ${idx + 1}: ${d.title} (${d.code || 'Nội bộ'}) ---\n${d.content}`
+            ).join('\n\n');
+
+            let aiReplyText = '';
+            let isAnsweredFromDocs = false;
+            let matchedDocTitle = '';
+
+            try {
+                // Thử gọi Gemini API với System Instruction ràng buộc RAG nghiêm ngặt
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const systemInstructionText = `Bạn là Cán bộ Trợ lý Ảo của Công an Phường Bình Lộc (Địa chỉ: Khu phố Bình Lộc, phường Bình Lộc; Số điện thoại trực ban: 02513788287).
+QUY TẮC TUYỆT ĐỐI (BẮT BUỘC TUÂN THỦ):
+1. Bạn CHỈ ĐƯỢC PHÉP trả lời dựa trên thông tin có trong [KHO VĂN BẢN ĐÍNH KÈM] dưới đây.
+2. Tuyệt đối KHÔNG sử dụng kiến thức bên ngoài, KHÔNG suy diễn, KHÔNG tự bịa thêm quy định không có trong văn bản.
+3. Nếu câu hỏi của công dân không có thông tin trong [KHO VĂN BẢN ĐÍNH KÈM], bạn PHẢI bắt đầu câu trả lời bằng cụm từ "[NGOÀI_PHẠM_VI]" và trả lời lịch sự: "Xin lỗi Ông/Bà, nội dung câu hỏi này hiện chưa có trong danh mục văn bản hướng dẫn được đính kèm trên hệ thống. Đề nghị Ông/Bà liên hệ trực tiếp số điện thoại trực ban Công an Phường Bình Lộc: 02513788287 hoặc đến trực tiếp trụ sở tại Khu phố Bình Lộc, phường Bình Lộc để được cán bộ hướng dẫn cụ thể."
+4. Khi trả lời từ văn bản, trình bày rõ ràng, mạch lạc, gạch đầu dòng dễ đọc, cuối câu trả lời ghi rõ nguồn trích dẫn từ tên văn bản nào.
+
+[KHO VĂN BẢN ĐÍNH KÈM]:
+${knowledgeContext || 'HIỆN KHÔNG CÓ VĂN BẢN NÀO ĐƯỢC ĐÍNH KÈM.'}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuestion }] }],
+                    systemInstruction: {
+                        parts: [{ text: systemInstructionText }]
+                    }
+                };
+
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response && response.ok) {
+                    const data = await response.json();
+                    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    if (rawText) {
+                        if (rawText.includes('[NGOÀI_PHẠM_VI]')) {
+                            isAnsweredFromDocs = false;
+                            aiReplyText = rawText.replace('[NGOÀI_PHẠM_VI]', '').trim();
+                        } else {
+                            isAnsweredFromDocs = true;
+                            aiReplyText = rawText;
+                            matchedDocTitle = activeDocs.map(d => d.title).join(', ');
+                        }
+                    } else {
+                        throw new Error('Empty API response');
+                    }
+                } else {
+                    throw new Error('API fallback triggered');
+                }
+            } catch (err) {
+                // Chế độ đối chiếu thông minh trực tiếp từ Kho Tri thức nội bộ (hoạt động cả khi offline hoặc chưa có API key)
+                const localMatch = searchLocalKnowledgeBase(userQuestion, activeDocs);
+                isAnsweredFromDocs = localMatch.found;
+                aiReplyText = localMatch.reply;
+                matchedDocTitle = localMatch.docTitle;
+            }
+
+            removeTypingIndicator(typingId);
+            appendChatMessage('bot', aiReplyText, true);
+
+            // Ghi nhật ký câu hỏi vào hệ thống để Admin thống kê
+            questionsLog.unshift({
+                id: 'q-' + Date.now(),
+                question: userQuestion,
+                status: isAnsweredFromDocs ? 'answered' : 'out_of_scope',
+                matchedDoc: matchedDocTitle || 'Không thuộc văn bản đính kèm',
+                timestamp: new Date().toISOString()
+            });
+            saveQuestionsLog();
+        }
+
+        // Thuật toán đối chiếu từ khóa & trích xuất đoạn văn bản nội bộ khi chạy offline
+        function searchLocalKnowledgeBase(query, activeDocs) {
+            if (!activeDocs || activeDocs.length === 0) {
+                return {
+                    found: false,
+                    docTitle: '',
+                    reply: `Xin lỗi Ông/Bà, hiện tại Quản trị viên chưa kích hoạt văn bản hướng dẫn nào trong Kho tri thức của hệ thống.\n\nĐề nghị Ông/Bà liên hệ trực tiếp số điện thoại trực ban **Công an Phường Bình Lộc: 02513788287** hoặc đến trụ sở tại **Khu phố Bình Lộc, phường Bình Lộc** để được cán bộ tiếp dân hướng dẫn trực tiếp.`
+                };
+            }
+
+            const normalize = (str) => str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const stopWords = ['la', 'gi', 'nhu', 'the', 'nao', 'cua', 'tai', 'cho', 'toi', 'hoi', 've', 'thu', 'tuc', 'lam', 'can', 'co', 'khong', 'duoc', 'o', 'dau', 'may', 'gio'];
+            const queryTokens = normalize(query)
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .split(/\s+/)
+                .filter(w => w.length >= 2 && !stopWords.includes(w));
+
+            let bestDoc = null;
+            let bestScore = 0;
+
+            activeDocs.forEach(doc => {
+                const docTextNorm = normalize(doc.title + ' ' + doc.content);
+                let score = 0;
+                queryTokens.forEach(token => {
+                    if (docTextNorm.includes(token)) {
+                        score += normalize(doc.title).includes(token) ? 3 : 1;
+                    }
+                });
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestDoc = doc;
+                }
+            });
+
+            if (bestDoc && bestScore >= 2) {
+                return {
+                    found: true,
+                    docTitle: bestDoc.title,
+                    reply: `Căn cứ theo tài liệu **${bestDoc.title}** (${bestDoc.code || 'Văn bản nội bộ Công an Phường Bình Lộc'}):\n\n${bestDoc.content}\n\n---\n*Nguồn trích dẫn: ${bestDoc.title} — Công an Phường Bình Lộc (Trực ban: 02513788287).*`
+                };
+            }
+
+            return {
+                found: false,
+                docTitle: '',
+                reply: `Xin lỗi Ông/Bà, câu hỏi này **nằm ngoài phạm vi nội dung các văn bản** hiện được Công an Phường Bình Lộc đính kèm trên hệ thống Trợ lý AI.\n\nĐể được giải đáp chính xác theo quy định, kính mời Ông/Bà liên hệ trực tiếp số điện thoại trực ban **02513788287** hoặc đến trụ sở **Công an Phường Bình Lộc (Khu phố Bình Lộc, phường Bình Lộc)** trong giờ làm việc.`
+            };
+        }
+
+        async function fetchWithRetry(url, options, retries = 2, delay = 800) {
+            for (let i = 0; i <= retries; i++) {
+                try {
+                    const res = await fetch(url, options);
+                    if (res.ok) return res;
+                } catch (e) {
+                    // Bỏ qua lỗi mạng để thử lại hoặc chuyển sang chế độ offline
+                }
+                if (i < retries) {
+                    await new Promise(r => setTimeout(r, delay * Math.pow(2, i)));
+                }
+            }
+            return null;
+        }
+
+        function appendChatMessage(sender, text, isMarkdown = false) {
+            const container = document.getElementById('chat-messages');
+            const wrapper = document.createElement('div');
+            wrapper.className = sender === 'user' ? 'flex items-start justify-end space-x-3' : 'flex items-start space-x-3';
+
+            if (sender === 'user') {
+                wrapper.innerHTML = `
+                    <div class="bg-blue-900 text-white rounded-2xl rounded-tr-none px-4 py-3 shadow-sm max-w-[80%] text-sm leading-relaxed">
+                        ${escapeHTML(text)}
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                `;
+            } else {
+                const formattedHTML = isMarkdown ? formatMarkdownBasic(text) : escapeHTML(text);
+                wrapper.innerHTML = `
+                    <div class="w-9 h-9 flex-shrink-0 drop-shadow-xs">
+                        <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="112" height="112" rx="24" fill="#991B1B" stroke="#FACC15" stroke-width="6"/>
+                            <polygon points="60,15 63.3,24.5 73.5,24.5 65.2,30.5 68.3,40 60,34.2 51.7,40 54.8,30.5 46.5,24.5 56.7,24.5" fill="#FACC15"/>
+                            <text x="60" y="68" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="28" fill="#FACC15">CAP</text>
+                            <text x="60" y="90" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="13" fill="#FFFFFF">BÌNH LỘC</text>
+                        </svg>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-4 shadow-sm max-w-[85%] text-sm text-slate-800 leading-relaxed space-y-1.5">
+                        ${formattedHTML}
+                    </div>
+                `;
+            }
+
+            container.appendChild(wrapper);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendTypingIndicator() {
+            const container = document.getElementById('chat-messages');
+            const id = 'typing-' + Date.now();
+            const wrapper = document.createElement('div');
+            wrapper.id = id;
+            wrapper.className = 'flex items-start space-x-3';
+            wrapper.innerHTML = `
+                <div class="w-9 h-9 flex-shrink-0">
+                    <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="4" width="112" height="112" rx="24" fill="#991B1B" stroke="#FACC15" stroke-width="6"/>
+                        <polygon points="60,15 63.3,24.5 73.5,24.5 65.2,30.5 68.3,40 60,34.2 51.7,40 54.8,30.5 46.5,24.5 56.7,24.5" fill="#FACC15"/>
+                        <text x="60" y="68" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="28" fill="#FACC15">CAP</text>
+                        <text x="60" y="90" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="13" fill="#FFFFFF">BÌNH LỘC</text>
+                    </svg>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm flex items-center space-x-1.5">
+                    <span class="w-2 h-2 bg-red-700 rounded-full typing-dot"></span>
+                    <span class="w-2 h-2 bg-red-700 rounded-full typing-dot"></span>
+                    <span class="w-2 h-2 bg-red-700 rounded-full typing-dot"></span>
+                    <span class="text-xs text-slate-500 ml-2">Đang đối chiếu Kho văn bản nội bộ...</span>
+                </div>
+            `;
+            container.appendChild(wrapper);
+            container.scrollTop = container.scrollHeight;
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="w-9 h-9 flex-shrink-0">
+                        <svg viewBox="0 0 120 120" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="4" width="112" height="112" rx="24" fill="#991B1B" stroke="#FACC15" stroke-width="6"/>
+                            <polygon points="60,15 63.3,24.5 73.5,24.5 65.2,30.5 68.3,40 60,34.2 51.7,40 54.8,30.5 46.5,24.5 56.7,24.5" fill="#FACC15"/>
+                            <text x="60" y="68" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="28" fill="#FACC15">CAP</text>
+                            <text x="60" y="90" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="13" fill="#FFFFFF">BÌNH LỘC</text>
+                        </svg>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-4 shadow-sm max-w-[85%] text-sm text-slate-800 leading-relaxed">
+                        <p class="font-bold text-red-800 mb-1">Đã bắt đầu phiên tư vấn mới!</p>
+                        <p>Tôi là <strong>Trợ lý AI Hành chính công của Công an Phường Bình Lộc</strong> (Khu phố Bình Lộc, phường Bình Lộc • Trực ban: 02513788287). Xin mời Ông/Bà đặt câu hỏi.</p>
+                    </div>
+                </div>
+            `;
+            showToast('Đã làm mới cuộc hội thoại.', 'info');
+        }
+
+        // ==================== 6. KHU VỰC QUẢN TRỊ ADMIN ====================
+        function handleAdminAccess() {
+            if (isAdminLoggedIn) {
+                switchMainTab('admin');
+            } else {
+                document.getElementById('admin-password-input').value = '';
+                document.getElementById('admin-login-modal').classList.remove('hidden');
+                setTimeout(() => document.getElementById('admin-password-input').focus(), 100);
+            }
+        }
+
+        function closeAdminLoginModal() {
+            document.getElementById('admin-login-modal').classList.add('hidden');
+        }
+
+        function verifyAdminLogin(event) {
+            event.preventDefault();
+            const entered = document.getElementById('admin-password-input').value;
+            if (entered === systemSettings.adminPassword) {
+                isAdminLoggedIn = true;
+                sessionStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, 'true');
+                closeAdminLoginModal();
+                updateAdminNavUI();
+                switchMainTab('admin');
+                showToast('Đăng nhập quyền Quản trị Admin thành công!', 'success');
+            } else {
+                showToast('Mật khẩu quản trị không chính xác!', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+            updateAdminNavUI();
+            switchMainTab('booking');
+            showToast('Đã đăng xuất khỏi phiên Quản trị Admin.', 'info');
+        }
+
+        function updateAdminNavUI() {
+            const label = document.getElementById('admin-nav-label');
+            if (isAdminLoggedIn) {
+                label.textContent = 'Bảng Điều Khiển Admin';
+            } else {
+                label.textContent = 'Quản trị Admin';
+            }
+        }
+
+        function switchAdminSubTab(subTab) {
+            const tabs = ['appointments', 'questions', 'knowledge', 'settings'];
+            tabs.forEach(t => {
+                const panel = document.getElementById(`admin-subtab-${t}`);
+                const btn = document.getElementById(`subtab-btn-${t}`);
+                if (t === subTab) {
+                    panel.classList.remove('hidden');
+                    btn.className = 'admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-red-800 text-white shadow-sm flex items-center gap-2';
+                } else {
+                    panel.classList.add('hidden');
+                    btn.className = 'admin-subtab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 flex items-center gap-2';
+                }
+            });
+
+            if (subTab === 'appointments') renderAdminBookingsDashboard();
+            if (subTab === 'questions') renderAdminQuestionsDashboard();
+            if (subTab === 'knowledge') renderAdminKnowledgeList();
+            if (subTab === 'settings') {
+                document.getElementById('setting-max-slots').value = systemSettings.maxSlotsPerShift;
+            }
+        }
+
+        function refreshAdminDashboard() {
+            renderAdminBookingsDashboard();
+            renderAdminQuestionsDashboard();
+            renderAdminKnowledgeList();
+        }
+
+        // --- 6.1 Thống kê & Quản lý Lịch đăng ký ---
+        function renderAdminBookingsDashboard() {
+            const today = getTodayISO();
+            const total = bookings.length;
+            const todayCount = bookings.filter(b => b.date === today).length;
+            const pendingCount = bookings.filter(b => b.status === 'Chờ tiếp nhận' || b.status === 'Đang gọi số').length;
+            const completedCount = bookings.filter(b => b.status === 'Hoàn thành').length;
+
+            document.getElementById('stat-total-bookings').textContent = total;
+            document.getElementById('stat-today-bookings').textContent = todayCount;
+            document.getElementById('stat-today-date-label').textContent = `Ngày ${formatDateVN(today)}`;
+            document.getElementById('stat-pending-bookings').textContent = pendingCount;
+            document.getElementById('stat-completed-bookings').textContent = completedCount;
+
+            // Biểu đồ thanh theo nhóm thủ tục
+            const procedures = [
+                'Cấp mới / Nâng mức tài khoản VNeID mức độ 2',
+                'Kích hoạt lại tài khoản VNeID (đổi thiết bị / quên mật khẩu)',
+                'Thay đổi số điện thoại đăng ký VNeID',
+                'Tích hợp giấy tờ (BHYT, GPLX, Đăng ký xe, Cư trú)'
+            ];
+            const barsContainer = document.getElementById('procedure-stats-bars');
+            barsContainer.innerHTML = procedures.map(proc => {
+                const count = bookings.filter(b => b.procedure === proc).length;
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                return `
+                    <div>
+                        <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                            <span class="truncate pr-2">${escapeHTML(proc)}</span>
+                            <span class="flex-shrink-0 text-red-800 font-bold">${count} lượt (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                            <div class="bg-gradient-to-r from-red-700 to-amber-500 h-2.5 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            renderAdminBookingsTable();
+        }
+
+        function renderAdminBookingsTable() {
+            const search = document.getElementById('filter-booking-search').value.trim().toLowerCase();
+            const dateFilter = document.getElementById('filter-booking-date').value;
+            const procFilter = document.getElementById('filter-booking-procedure').value;
+            const statusFilter = document.getElementById('filter-booking-status').value;
+
+            const filtered = bookings.filter(b => {
+                const matchSearch = !search ||
+                    b.name.toLowerCase().includes(search) ||
+                    b.phone.toLowerCase().includes(search) ||
+                    b.id.toLowerCase().includes(search);
+                const matchDate = !dateFilter || b.date === dateFilter;
+                const matchProc = !procFilter || b.procedure === procFilter;
+                const matchStatus = !statusFilter || b.status === statusFilter;
+                return matchSearch && matchDate && matchProc && matchStatus;
+            });
+
+            const tbody = document.getElementById('admin-bookings-tbody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-slate-400 text-xs">
+                            Không có lịch đăng ký nào phù hợp với bộ lọc hiện tại.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(b => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="py-3 px-4 font-black text-red-800 whitespace-nowrap">${escapeHTML(b.id)}</td>
+                    <td class="py-3 px-4">
+                        <p class="font-bold text-slate-900">${escapeHTML(b.name)}</p>
+                        <p class="text-xs text-slate-500 font-medium"><i class="fa-solid fa-phone mr-1 text-slate-400"></i>${escapeHTML(b.phone)}</p>
+                    </td>
+                    <td class="py-3 px-4 max-w-xs">
+                        <p class="font-semibold text-slate-800 text-xs">${escapeHTML(b.procedure)}</p>
+                        ${b.note ? `<p class="text-[11px] text-slate-500 italic mt-0.5">Ghi chú: ${escapeHTML(b.note)}</p>` : ''}
+                    </td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <p class="font-bold text-blue-900 text-xs">${formatDateVN(b.date)}</p>
+                        <p class="text-[11px] text-slate-600">${escapeHTML(b.slot)}</p>
+                    </td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${getStatusBadgeClass(b.status)}">
+                            ${escapeHTML(b.status)}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-right whitespace-nowrap">
+                        <div class="inline-flex items-center gap-1">
+                            <button onclick="updateBookingStatus('${b.id}', 'Đang gọi số')" title="Gọi số tiếp nhận"
+                                class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-[11px] font-bold">
+                                Gọi số
+                            </button>
+                            <button onclick="updateBookingStatus('${b.id}', 'Hoàn thành')" title="Xác nhận hoàn thành"
+                                class="px-2 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-lg text-[11px] font-bold">
+                                Hoàn thành
+                            </button>
+                            <button onclick="updateBookingStatus('${b.id}', 'Đã hủy')" title="Hủy lịch"
+                                class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[11px] font-bold">
+                                Hủy
+                            </button>
+                            <button onclick="deleteBooking('${b.id}')" title="Xóa bản ghi"
+                                class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg text-xs">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function resetBookingFilters() {
+            document.getElementById('filter-booking-search').value = '';
+            document.getElementById('filter-booking-date').value = '';
+            document.getElementById('filter-booking-procedure').value = '';
+            document.getElementById('filter-booking-status').value = '';
+            renderAdminBookingsTable();
+        }
+
+        function updateBookingStatus(id, newStatus) {
+            const idx = bookings.findIndex(b => b.id === id);
+            if (idx !== -1) {
+                bookings[idx].status = newStatus;
+                saveBookings();
+                updateAvailableSlots();
+                renderAdminBookingsDashboard();
+                showToast(`Đã cập nhật phiếu ${id} sang trạng thái "${newStatus}".`, 'success');
+            }
+        }
+
+        function deleteBooking(id) {
+            bookings = bookings.filter(b => b.id !== id);
+            saveBookings();
+            updateAvailableSlots();
+            renderAdminBookingsDashboard();
+            showToast(`Đã xóa phiếu hẹn ${id}.`, 'info');
+        }
+
+        function exportBookingsCSV() {
+            const headers = ['Mã phiếu', 'Họ và tên', 'Số điện thoại', 'Thủ tục', 'Ngày hẹn', 'Ca làm việc', 'Ghi chú', 'Trạng thái'];
+            const rows = bookings.map(b => [
+                b.id,
+                `"${b.name.replace(/"/g, '""')}"`,
+                `"${b.phone}"`,
+                `"${b.procedure.replace(/"/g, '""')}"`,
+                b.date,
+                `"${b.slot}"`,
+                `"${(b.note || '').replace(/"/g, '""')}"`,
+                `"${b.status}"`
+            ]);
+            downloadCSV('Danh_sach_lich_hen_CAP_Binh_Loc.csv', headers, rows);
+        }
+
+        // --- 6.2 Thống kê & Lọc Nội dung Câu hỏi AI ---
+        function renderAdminQuestionsDashboard() {
+            const total = questionsLog.length;
+            const answered = questionsLog.filter(q => q.status === 'answered').length;
+            const outOfScope = questionsLog.filter(q => q.status === 'out_of_scope').length;
+
+            document.getElementById('stat-total-questions').textContent = total;
+            document.getElementById('stat-answered-questions').textContent = answered;
+            document.getElementById('stat-unanswered-questions').textContent = outOfScope;
+
+            renderAdminQuestionsTable();
+        }
+
+        function renderAdminQuestionsTable() {
+            const search = document.getElementById('filter-question-search').value.trim().toLowerCase();
+            const dateFilter = document.getElementById('filter-question-date').value;
+            const statusFilter = document.getElementById('filter-question-status').value;
+
+            const filtered = questionsLog.filter(q => {
+                const matchSearch = !search || q.question.toLowerCase().includes(search);
+                const qDate = q.timestamp ? q.timestamp.split('T')[0] : '';
+                const matchDate = !dateFilter || qDate === dateFilter;
+                const matchStatus = !statusFilter || q.status === statusFilter;
+                return matchSearch && matchDate && matchStatus;
+            });
+
+            const tbody = document.getElementById('admin-questions-tbody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="py-8 text-center text-slate-400 text-xs">
+                            Chưa có dữ liệu câu hỏi nào phù hợp với bộ lọc.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(q => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">
+                        ${formatDateTimeVN(q.timestamp)}
+                    </td>
+                    <td class="py-3 px-4">
+                        <p class="font-semibold text-slate-800">${escapeHTML(q.question)}</p>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Nguồn đối chiếu: ${escapeHTML(q.matchedDoc || '')}</p>
+                    </td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        ${q.status === 'answered'
+                            ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-check mr-1"></i>Đã trả lời từ văn bản</span>`
+                            : `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Ngoài phạm vi văn bản</span>`
+                        }
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="deleteQuestionLog('${q.id}')" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg text-xs">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function resetQuestionFilters() {
+            document.getElementById('filter-question-search').value = '';
+            document.getElementById('filter-question-date').value = '';
+            document.getElementById('filter-question-status').value = '';
+            renderAdminQuestionsTable();
+        }
+
+        function deleteQuestionLog(id) {
+            questionsLog = questionsLog.filter(q => q.id !== id);
+            saveQuestionsLog();
+            renderAdminQuestionsDashboard();
+            showToast('Đã xóa bản ghi câu hỏi.', 'info');
+        }
+
+        function exportQuestionsCSV() {
+            const headers = ['Thời gian', 'Nội dung câu hỏi', 'Trạng thái xử lý', 'Văn bản đối chiếu'];
+            const rows = questionsLog.map(q => [
+                `"${formatDateTimeVN(q.timestamp)}"`,
+                `"${q.question.replace(/"/g, '""')}"`,
+                q.status === 'answered' ? '"Đã trả lời từ văn bản"' : '"Ngoài phạm vi văn bản"',
+                `"${(q.matchedDoc || '').replace(/"/g, '""')}"`
+            ]);
+            downloadCSV('Thong_ke_cau_hoi_AI_CAP_Binh_Loc.csv', headers, rows);
+        }
+
+        // --- 6.3 Kho Tri thức AI (Quản lý Văn bản đính kèm) ---
+        function renderAdminKnowledgeList() {
+            const container = document.getElementById('admin-knowledge-list');
+            if (knowledgeDocs.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-400 text-xs">
+                        Chưa có văn bản nào trong Kho tri thức AI. Hãy thêm văn bản ở biểu mẫu bên cạnh.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = knowledgeDocs.map(doc => `
+                <div class="bg-white rounded-2xl border ${doc.active ? 'border-slate-200' : 'border-slate-200 opacity-65'} p-5 shadow-sm space-y-2.5">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[11px] font-bold ${doc.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">
+                                    ${doc.active ? 'Đang áp dụng cho AI' : 'Đã tạm tắt'}
+                                </span>
+                                <span class="text-[11px] text-slate-500 font-medium">${escapeHTML(doc.code || '')}</span>
+                            </div>
+                            <h4 class="font-extrabold text-slate-900 text-sm sm:text-base mt-1">${escapeHTML(doc.title)}</h4>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <button onclick="toggleDocActive('${doc.id}')" title="Bật/Tắt hiệu lực"
+                                class="px-2.5 py-1.5 rounded-lg text-xs font-bold border ${doc.active ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-emerald-300 bg-emerald-50 text-emerald-800'}">
+                                ${doc.active ? 'Tạm tắt' : 'Kích hoạt'}
+                            </button>
+                            <button onclick="editKnowledgeDoc('${doc.id}')" title="Chỉnh sửa nội dung"
+                                class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200 hover:bg-blue-100">
+                                <i class="fa-solid fa-pen"></i> Sửa
+                            </button>
+                            <button onclick="deleteKnowledgeDoc('${doc.id}')" title="Xóa văn bản"
+                                class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-3 text-xs text-slate-700 max-h-32 overflow-y-auto whitespace-pre-line border border-slate-100 leading-relaxed">
+                        ${escapeHTML(doc.content)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveKnowledgeDoc(event) {
+            event.preventDefault();
+            const editId = document.getElementById('doc-edit-id').value;
+            const title = document.getElementById('doc-title').value.trim();
+            const code = document.getElementById('doc-code').value.trim();
+            const content = document.getElementById('doc-content').value.trim();
+            const active = document.getElementById('doc-active').checked;
+
+            if (editId) {
+                const idx = knowledgeDocs.findIndex(d => d.id === editId);
+                if (idx !== -1) {
+                    knowledgeDocs[idx] = {
+                        ...knowledgeDocs[idx],
+                        title,
+                        code,
+                        content,
+                        active,
+                        updatedAt: getTodayISO()
+                    };
+                }
+                showToast('Đã cập nhật văn bản trong Kho tri thức AI!', 'success');
+            } else {
+                knowledgeDocs.unshift({
+                    id: 'doc-' + Date.now(),
+                    title,
+                    code,
+                    content,
+                    active,
+                    updatedAt: getTodayISO()
+                });
+                showToast('Đã thêm văn bản mới để Trợ lý AI học!', 'success');
+            }
+
+            saveKnowledgeDocs();
+            cancelEditDoc();
+            renderAdminKnowledgeList();
+        }
+
+        function editKnowledgeDoc(id) {
+            const doc = knowledgeDocs.find(d => d.id === id);
+            if (!doc) return;
+
+            document.getElementById('doc-edit-id').value = doc.id;
+            document.getElementById('doc-title').value = doc.title;
+            document.getElementById('doc-code').value = doc.code || '';
+            document.getElementById('doc-content').value = doc.content;
+            document.getElementById('doc-active').checked = doc.active;
+
+            document.getElementById('doc-form-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-700"></i><span>Chỉnh sửa Văn bản Kho Tri thức</span>`;
+            document.getElementById('doc-submit-btn-text').textContent = 'Cập nhật Văn bản';
+            document.getElementById('doc-cancel-edit-btn').classList.remove('hidden');
+        }
+
+        function cancelEditDoc() {
+            document.getElementById('doc-edit-id').value = '';
+            document.getElementById('doc-title').value = '';
+            document.getElementById('doc-code').value = '';
+            document.getElementById('doc-content').value = '';
+            document.getElementById('doc-active').checked = true;
+
+            document.getElementById('doc-form-title').innerHTML = `<i class="fa-solid fa-file-circle-plus text-red-700"></i><span>Thêm Văn bản mới cho AI học</span>`;
+            document.getElementById('doc-submit-btn-text').textContent = 'Lưu & Huấn luyện AI';
+            document.getElementById('doc-cancel-edit-btn').classList.add('hidden');
+        }
+
+        function toggleDocActive(id) {
+            const doc = knowledgeDocs.find(d => d.id === id);
+            if (doc) {
+                doc.active = !doc.active;
+                saveKnowledgeDocs();
+                renderAdminKnowledgeList();
+                showToast(doc.active ? 'Đã kích hoạt văn bản cho AI.' : 'Đã tạm tắt hiệu lực văn bản.', 'info');
+            }
+        }
+
+        function deleteKnowledgeDoc(id) {
+            knowledgeDocs = knowledgeDocs.filter(d => d.id !== id);
+            saveKnowledgeDocs();
+            renderAdminKnowledgeList();
+            showToast('Đã xóa văn bản khỏi Kho tri thức AI.', 'info');
+        }
+
+        function importTextFileToDoc(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('doc-content').value = e.target.result;
+                if (!document.getElementById('doc-title').value) {
+                    document.getElementById('doc-title').value = file.name.replace(/\.[^/.]+$/, '');
+                }
+                showToast(`Đã nạp nội dung từ tệp "${file.name}".`, 'success');
+            };
+            reader.readAsText(file, 'UTF-8');
+            event.target.value = '';
+        }
+
+        // --- 6.4 Cài đặt Hệ thống & Sao lưu ---
+        function saveSystemSettings() {
+            const val = parseInt(document.getElementById('setting-max-slots').value, 10);
+            if (isNaN(val) || val < 1 || val > 500) {
+                showToast('Vui lòng nhập định mức lượt/ca hợp lệ (1 - 500).', 'error');
+                return;
+            }
+            systemSettings.maxSlotsPerShift = val;
+            saveSettings();
+            updateAvailableSlots();
+            showToast(`Đã cập nhật định mức tiếp nhận tối đa ${val} lượt/ca.`, 'success');
+        }
+
+        function changeAdminPassword(event) {
+            event.preventDefault();
+            const p1 = document.getElementById('new-admin-pass').value;
+            const p2 = document.getElementById('confirm-admin-pass').value;
+            if (p1 !== p2) {
+                showToast('Mật khẩu xác nhận không trùng khớp!', 'error');
+                return;
+            }
+            systemSettings.adminPassword = p1;
+            saveSettings();
+            document.getElementById('new-admin-pass').value = '';
+            document.getElementById('confirm-admin-pass').value = '';
+            showToast('Đã đổi mật khẩu Quản trị Admin thành công!', 'success');
+        }
+
+        function exportFullBackupJSON() {
+            const payload = {
+                unit: 'Công an Phường Bình Lộc',
+                exportedAt: new Date().toISOString(),
+                bookings,
+                questionsLog,
+                knowledgeDocs,
+                systemSettings
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Sao_luu_He_thong_CAP_Binh_Loc_${getTodayISO()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Đã tải xuống tệp sao lưu hệ thống (.JSON).', 'success');
+        }
+
+        function importFullBackupJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data.bookings)) bookings = data.bookings;
+                    if (Array.isArray(data.questionsLog)) questionsLog = data.questionsLog;
+                    if (Array.isArray(data.knowledgeDocs)) knowledgeDocs = data.knowledgeDocs;
+                    if (data.systemSettings) systemSettings = { ...systemSettings, ...data.systemSettings };
+
+                    saveBookings();
+                    saveQuestionsLog();
+                    saveKnowledgeDocs();
+                    saveSettings();
+                    updateAvailableSlots();
+                    refreshAdminDashboard();
+                    showToast('Khôi phục toàn bộ dữ liệu từ tệp sao lưu thành công!', 'success');
+                } catch (err) {
+                    showToast('Tệp sao lưu JSON không hợp lệ!', 'error');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+            event.target.value = '';
+        }
+
+        function resetDefaultKnowledge() {
+            knowledgeDocs = JSON.parse(JSON.stringify(DEFAULT_KNOWLEDGE_DOCS));
+            saveKnowledgeDocs();
+            renderAdminKnowledgeList();
+            showToast('Đã khôi phục 4 văn bản mẫu chuẩn của Công an Phường Bình Lộc.', 'success');
+        }
+
+        // ==================== 7. TIỆN ÍCH HỖ TRỢ ====================
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatMarkdownBasic(text) {
+            let safe = escapeHTML(text);
+            safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-900">$1</strong>');
+            safe = safe.replace(/\*(.*?)\*/g, '<em class="italic text-slate-600">$1</em>');
+            safe = safe.replace(/\n/g, '<br>');
+            return safe;
+        }
+
+        function formatDateVN(isoDate) {
+            if (!isoDate) return '';
+            const parts = isoDate.split('-');
+            if (parts.length !== 3) return isoDate;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        function formatDateTimeVN(isoStr) {
+            if (!isoStr) return '';
+            const d = new Date(isoStr);
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'Hoàn thành': return 'bg-emerald-100 text-emerald-800';
+                case 'Đang gọi số': return 'bg-blue-100 text-blue-800';
+                case 'Đã hủy': return 'bg-slate-200 text-slate-600';
+                default: return 'bg-amber-100 text-amber-800';
+            }
+        }
+
+        function downloadCSV(filename, headers, rows) {
+            const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Đã xuất tệp báo cáo "${filename}".`, 'success');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-emerald-800 text-white border-emerald-600',
+                error: 'bg-red-800 text-white border-red-600',
+                warning: 'bg-amber-500 text-red-950 border-amber-400',
+                info: 'bg-slate-800 text-white border-slate-600'
+            };
+            const icons = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-xmark',
+                warning: 'fa-triangle-exclamation',
+                info: 'fa-circle-info'
+            };
+            toast.className = `pointer-events-auto p-3.5 rounded-xl shadow-lg border text-xs font-bold flex items-center gap-2.5 transition-all duration-300 ${colors[type] || colors.info}`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base"></i><span>${escapeHTML(message)}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
